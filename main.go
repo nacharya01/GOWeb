@@ -7,24 +7,21 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/nacharya01/GOWeb/controller"
-	"github.com/nacharya01/GOWeb/db"
+	_ "github.com/nacharya01/GOWeb/db"
 	"github.com/nacharya01/GOWeb/logger"
 	"github.com/nacharya01/GOWeb/router"
 )
 
-var LOG *logger.LogDir = logger.New();
+var LOG *logger.Logger = logger.LOG;
 
 func main(){	
 	//Load .env file
 	errEnv := godotenv.Load(".env")
 	if errEnv != nil{
-		LOG.Error().Println("Error loading .env file", errEnv)
+		LOG.Error("Error loading .env file")
 	}
-	LOG.Info().Println("Successfully loaded .env file.")
+	LOG.Info("Successfully loaded .env file.")
 
-	//Init Database
-	db.Init()
-	
 	//GET Router
 	router := router.GetRouter()
 	router.HandleFunc("/", controller.HandleHomePage).Methods("GET")
@@ -36,11 +33,11 @@ func main(){
 	//Start server 
 	server := getServer(router)
 	
-	LOG.Info().Printf("Server successfully started on port : %v", 8000)
+	LOG.Info("Server successfully started on port : 8000")
 	err := server.ListenAndServe()
 
 	if err != nil{
-		LOG.Error().Println("An unexpected error ocurred while starting the server", err)
+		LOG.Error("An unexpected error ocurred while starting the server" + err.Error() )
 	}
 }
 

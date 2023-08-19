@@ -7,54 +7,47 @@ import (
 	"time"
 )
 
-const (
-    DirectoryForLogFiles = "application_logs"
-)
-
-type LogDir struct {
-    LogDirectory string
+type Logger struct {
+    LogDirectory  string
+    LogFilePath   *os.File 
+    InfoLogger    *log.Logger
+    WarnLogger    *log.Logger
+    ErrorLogger   *log.Logger
+    FatalLogger   *log.Logger
 }
 
-//Create a directory and return the struct containing the directory path.
-func New() *LogDir {
-    err := os.Mkdir(DirectoryForLogFiles, 0777)
+var LOG  = &Logger{
+    LogDirectory: "application_logs",
+}
+
+func init() {
+   
+    err := os.Mkdir(LOG.LogDirectory, 0777)
     if err != nil {
-        return nil
+        fmt.Println("Logger initialization failed." + err.Error())
     }
-    return &LogDir{
-        LogDirectory: DirectoryForLogFiles,
-    }
-}
-
-// Setting up the pattern of the log file.
-func SetLogFile() *os.File {
     year, month, day := time.Now().Date()
     fileName := fmt.Sprintf("%v-%v-%v.log", day, month.String(), year)
-    filePath, _ := os.OpenFile(DirectoryForLogFiles+"/"+fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-
-    return filePath
+    filePath, _ := os.OpenFile(LOG.LogDirectory+"/"+fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+    LOG.LogFilePath = filePath
+    LOG.InfoLogger = log.New(filePath, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+    LOG.WarnLogger = log.New(filePath, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile)
+    LOG.ErrorLogger = log.New(filePath, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+    LOG.FatalLogger = log.New(filePath, "FATAL: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
-// Info level log
-func (l *LogDir) Info() *log.Logger {
-    getFilePath := SetLogFile()
-    return log.New(getFilePath, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+func (l *Logger) Info(message string)  {
+    l.InfoLogger.Println(message)
 }
 
-// Waringin level log
-func (l *LogDir) Warning() *log.Logger {
-    getFilePath := SetLogFile()
-    return log.New(getFilePath, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+func (l *Logger) Warning(message string)  {
+    l.WarnLogger.Println(message)
 }
 
-// Error level log
-func (l *LogDir) Error() *log.Logger {
-    getFilePath := SetLogFile()
-    return log.New(getFilePath, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+func (l *Logger) Error(message string)  {
+    l.ErrorLogger.Println(message)
 }
 
-// Fatal level log
-func (l *LogDir) Fatal() *log.Logger {
-    getFilePath := SetLogFile()
-    return log.New(getFilePath, "FATAL: ", log.Ldate|log.Ltime|log.Lshortfile)
+func (l *Logger) Fatal(message string)  {
+    l.FatalLogger.Println(message)
 }

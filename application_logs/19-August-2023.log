@@ -1,0 +1,3 @@
+INFO: 2023/08/19 11:49:29 logger.go:42: Database initialization has been successfull
+INFO: 2023/08/19 11:49:29 logger.go:42: Successfully loaded .env file.
+INFO: 2023/08/19 11:49:29 logger.go:42: Server successfully started on port : 8000

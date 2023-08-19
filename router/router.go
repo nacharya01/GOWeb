@@ -5,7 +5,6 @@ import (
 )
 
 func GetRouter() *mux.Router{
-	// Get the main router
 	r := mux.NewRouter()
 	return r
 }
